@@ -1,0 +1,10 @@
+{
+	"twitter": {
+        "_comment": "Plug in your API keys and then re-name this file to twitter.json",
+		"api_key": "A",
+		"api_secret": "B",
+		"bearer_token": "C",
+		"access_token":"D",
+		"access_secret":"E"
+	}
+}
