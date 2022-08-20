@@ -31,17 +31,23 @@ def getRandomVideoFile():
 
 def main():
     h = helpers.TwitterAPI()
-    video_image_rando = random.randrange(0, 4)
+    ch= helpers.CohostAPI()
+    video_image_rando = random.randrange(0, 3)
+    cohost_string=''
     if video_image_rando == 0:
         # images
         imagefiles = getRandomImageFiles()
         h.postImages(imagefiles)
+        cohost_string=ch.postImages(imagefiles)
     else:
         # videos
         videofile = getRandomVideoFile()
         print(videofile)
         h.postVideo(videofile)
-    print("OK")
+        cohost_string=ch.postVideo(videofile)
+    print("TWITTER OK")
+    ch.postToCohostSelenium(cohost_string)
+    print("COHOST (SELENIUM) OK")
 
 
 if __name__ == "__main__":

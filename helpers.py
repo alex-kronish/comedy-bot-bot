@@ -5,6 +5,11 @@ from requests_oauthlib import OAuth1
 import sys
 import time
 import mimetypes
+#import selenium
+from selenium import webdriver
+#import webdriver_manager
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.chrome.options import Options
 
 
 class TwitterAPI:
@@ -188,3 +193,93 @@ class TwitterAPI:
         }
         twreq = requests.post(url=self.tweet_endpoint_url, data=tweetdata, auth=self.oauth)
         print("Done!!!!!!!!")
+
+
+class CohostAPI:
+    def __init__(self):
+        conf_file = open('config/cohost.json', "rt+")
+        conf=json.load(conf_file)
+        conf_file.close()
+        self.url_base = conf["cohost"]["base_url"]
+        self.username=conf["cohost"]["username"]
+        self.account=conf["cohost"]["account"]
+        self.password=conf["cohost"]["password"]
+        pass
+
+    def postImages(self, images_array):
+        html_string = ''
+        for i in images_array:
+            url_of_image = self.url_base + i
+            html_temp = "<img src='" + url_of_image + "'> <br> "
+            html_string = html_string + html_temp
+        return html_string
+
+    def postVideo(self, videofile):
+        videos_url = self.url_base + videofile
+        return videos_url
+
+    def postToCohostSelenium(self, post_text):
+        starting_line = 'https://cohost.org'
+        login_button_main_page_xpath = '//*[@id="app"]/div/header/div/nav/a[1]'
+        email_login_field = '//*[@id="login-form"]/div[1]/div/input'
+        password_login_field = '//*[@id="login-form"]/div[2]/div/input'
+        login_button = '//*[@id="login-form"]/button'
+        email_addr = self.username
+        ass_blaster = self.password
+        post_button = '//*[@id="app"]/div/header/div/nav/a'
+        account_dropdown = '/html/body/div[1]/div/div/header/div/nav/form[1]/select'
+        account_dropdown_value = self.account
+        post_textfield = '/html/body/div[1]/div/div/div/div[2]/div/div/div[2]/article/div/div/div/div[2]/div[2]/textarea'
+        submit_post_button = '/html/body/div[1]/div/div/div/div[2]/div/div/div[2]/article/footer/div/div[3]/button[1]'
+        #sample_text = 'https://micolithe.us/comedy-bang-bang-ooc/media/vids/silly-little-birds-muxed.mp4'
+        log_out = '/html/body/div[1]/div/div/header/div/nav/form[2]/button'
+        chromedriver_location = '/home/media/chrome-linux/chromedriver'
+        chrome_opt=Options()
+        chrome_opt.add_argument("--headless")
+        chrome_opt.add_argument("--disable-gpu")
+        chrome_opt.add_argument("--window-size=1920,1080")
+        chrome_opt.add_argument("--start-maximized")
+        drv = webdriver.Chrome(chromedriver_location,options=chrome_opt)
+        drv.execute_cdp_cmd('Network.setUserAgentOverride', {
+            "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36'})
+        drv.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+            "source": """
+            Object.defineProperty(navigator, 'webdriver', {
+              get: () => undefined
+            })
+          """
+        })
+
+        drv.get(starting_line)
+        time.sleep(10)
+        # print(drv.page_source.encode('utf-8'))
+        go_to_login = drv.find_element_by_xpath(login_button_main_page_xpath)
+        go_to_login.click()
+        time.sleep(20)
+        login_textbox_uname = drv.find_element_by_xpath(email_login_field)
+        time.sleep(1)
+        login_textbox_uname.send_keys(email_addr)
+        time.sleep(1)
+        login_textbox_passwd = drv.find_element_by_xpath(password_login_field)
+        login_textbox_passwd.send_keys(ass_blaster)
+        time.sleep(5)
+        login_button_element = drv.find_element_by_xpath(login_button)
+        login_button_element.click()
+        time.sleep(5)
+        dropdown_sel = Select(drv.find_element_by_xpath(account_dropdown))
+        dropdown_sel.select_by_visible_text(account_dropdown_value)
+        time.sleep(5)
+        make_a_poast_button = drv.find_element_by_xpath(post_button)
+        make_a_poast_button.click()
+        time.sleep(5)
+        poasting_hole = drv.find_element_by_xpath(post_textfield)
+        poasting_hole.send_keys('\n')
+        poasting_hole.send_keys(post_text)
+        poasting_hole.send_keys('\n')
+        poasting_power = drv.find_element_by_xpath(submit_post_button)
+        poasting_power.click()
+        time.sleep(10)
+        logout_button = drv.find_element_by_xpath(log_out)
+        logout_button.click()
+        time.sleep(10)
+        drv.close()
