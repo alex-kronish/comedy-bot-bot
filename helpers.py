@@ -210,12 +210,12 @@ class CohostAPI:
         html_string = ''
         for i in images_array:
             url_of_image = self.url_base + i
-            html_temp = "<img src='" + url_of_image + "'> <br> "
+            html_temp = "<img src='" + url_of_image + "' style='margin-top:1px; margin-bottom:1px'> "
             html_string = html_string + html_temp
         return html_string
 
     def postVideo(self, videofile):
-        videos_url = self.url_base + videofile
+        videos_url = '\n'+self.url_base + videofile+'\n'
         return videos_url
 
     def postToCohostSelenium(self, post_text):
@@ -255,7 +255,7 @@ class CohostAPI:
         # print(drv.page_source.encode('utf-8'))
         go_to_login = drv.find_element_by_xpath(login_button_main_page_xpath)
         go_to_login.click()
-        time.sleep(20)
+        time.sleep(10)
         login_textbox_uname = drv.find_element_by_xpath(email_login_field)
         time.sleep(1)
         login_textbox_uname.send_keys(email_addr)
@@ -273,13 +273,11 @@ class CohostAPI:
         make_a_poast_button.click()
         time.sleep(5)
         poasting_hole = drv.find_element_by_xpath(post_textfield)
-        poasting_hole.send_keys('\n')
         poasting_hole.send_keys(post_text)
-        poasting_hole.send_keys('\n')
         poasting_power = drv.find_element_by_xpath(submit_post_button)
         poasting_power.click()
-        time.sleep(10)
+        time.sleep(5)
         logout_button = drv.find_element_by_xpath(log_out)
         logout_button.click()
-        time.sleep(10)
+        time.sleep(1)
         drv.close()
