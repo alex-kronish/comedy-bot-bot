@@ -10,6 +10,7 @@ from selenium import webdriver
 #import webdriver_manager
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
 
 
 class TwitterAPI:
@@ -220,22 +221,33 @@ class CohostAPI:
 
     def postToCohostSelenium(self, post_text):
         starting_line = 'https://cohost.org'
-        login_button_main_page_xpath = '//*[@id="app"]/div/header/div/nav/a[1]'
+        login_button_main_page_xpath = '//*[@id="app"]/div/header/div/nav/div/a[1]'
         email_login_field = '//*[@id="login-form"]/div[1]/div/input'
         password_login_field = '//*[@id="login-form"]/div[2]/div/input'
         login_button = '//*[@id="login-form"]/button'
         email_addr = self.username
         ass_blaster = self.password
-        post_button = '//*[@id="app"]/div/header/div/nav/a'
-        account_dropdown = '/html/body/div[1]/div/div/header/div/nav/form[1]/select'
+        #post_button = '/html/body/div[1]/div/div/header/div/nav/a'
+        #post_button='/html/body/div[1]/div/div/header/div/nav/div[2]/a'
+        post_button='/html/body/div[1]/div[1]/header/div/nav/div[2]'
+        #account_dropdown = '/html/body/div[1]/div/div/header/div/nav/div'
+        account_dropdown_x='/html/body/div[1]/div[1]/header/div/nav/div[1]/button/div[3]'
         account_dropdown_value = self.account
-        post_textfield = '/html/body/div[1]/div/div/div/div[2]/div/div/div[2]/article/div/div/div/div[2]/div[2]/textarea'
-        submit_post_button = '/html/body/div[1]/div/div/div/div[2]/div/div/div[2]/article/footer/div/div[3]/button[1]'
+        #post_textfield = '/html/body/div[1]/div/div/div/div[2]/div/div/div[2]/article/div/div/div/div[2]/div[2]/textarea'
+        #post_textfield='/html/body/div[1]/div[1]/div[2]/div[2]/div/div/div[2]/article/div/div/div/div[2]/div[2]/textarea'
+        #post_textfield='/html/body/div[2]/div[2]/div/div/div[2]/div/div/div[1]/div/div/div[2]/article/div/div/div/div[2]/div[2]/textarea'
+        post_textfield='//*[@id="headlessui-tabs-panel-:ru:"]/div/div[2]/div[2]/textarea'
+        #submit_post_button = '/html/body/div[1]/div/div/div/div[2]/div/div/div[2]/article/footer/div/div[3]/button[1]'
+        #submit_post_button='/html/body/div[1]/div[1]/div[2]/div[2]/div/div/div[2]/article/footer/div/div[3]/button[1]' 
+        #submit_post_button='/html/body/div[2]/div[2]/div/div/div[2]/div/div/div[1]/div/div/div[2]/article/footer/div/div[3]/button[1]'
+        submit_post_button='//*[@id="headlessui-dialog-panel-:rr:"]/div[1]/div/div[2]/article/footer/div/div[3]/button[1]'
+        #tags_input='/html/body/div[1]/div[1]/div[2]/div[2]/div/div/div[2]/article/div/div/div/div[2]/div[3]/div/input'
+        tags_input='//*[@id="downshift-0-input"]'
         #sample_text = 'https://micolithe.us/comedy-bang-bang-ooc/media/vids/silly-little-birds-muxed.mp4'
-        log_out = '/html/body/div[1]/div/div/header/div/nav/form[2]/button'
+        log_out = '/html/body/div[1]/div/div/header/div/nav/div[2]/form/button'
         chromedriver_location = '/home/media/chrome-linux/chromedriver'
         chrome_opt=Options()
-        chrome_opt.add_argument("--headless")
+        #chrome_opt.add_argument("--headless")
         chrome_opt.add_argument("--disable-gpu")
         chrome_opt.add_argument("--window-size=1920,1080")
         chrome_opt.add_argument("--start-maximized")
@@ -266,18 +278,31 @@ class CohostAPI:
         login_button_element = drv.find_element_by_xpath(login_button)
         login_button_element.click()
         time.sleep(5)
-        dropdown_sel = Select(drv.find_element_by_xpath(account_dropdown))
-        dropdown_sel.select_by_visible_text(account_dropdown_value)
-        time.sleep(5)
+        #dropdown_sel = Select(drv.find_element_by_xpath(account_dropdown))
+        #dropdown_sel.select_by_visible_text(account_dropdown_value)
+        account_dropdown=drv.find_element_by_xpath(account_dropdown_x)
+        account_dropdown.click()
+        time.sleep(2)
+        dropdown_sel=drv.find_element_by_css_selector('[alt="'+account_dropdown_value+'"]')
+        dropdown_sel.click()
+        time.sleep(30)
         make_a_poast_button = drv.find_element_by_xpath(post_button)
         make_a_poast_button.click()
         time.sleep(5)
         poasting_hole = drv.find_element_by_xpath(post_textfield)
         poasting_hole.send_keys(post_text)
+        time.sleep(1)
+        tags_field=drv.find_element_by_xpath(tags_input)
+        tags_field.send_keys('bot')
+        tags_field.send_keys(Keys.TAB)
+        time.sleep(1)
         poasting_power = drv.find_element_by_xpath(submit_post_button)
         poasting_power.click()
         time.sleep(5)
-        logout_button = drv.find_element_by_xpath(log_out)
+        account_dropdown=drv.find_element_by_xpath(account_dropdown_x)
+        account_dropdown.click()
+        time.sleep(2)
+        logout_button = drv.find_element_by_xpath("//span[text()='sign out']")
         logout_button.click()
         time.sleep(1)
         drv.close()
